@@ -148,6 +148,7 @@ const rules = {
     // для реализации функций поиска в приложениях
     searchMultipleFields: (searchKey, searchFields, caseSensitive = false) => (key, sourceValue, targetValue, source, target) => {
         // Применять это правило только при обработке ключа поиска
+
         if (key !== searchKey) {
             return { continue: true };
         }
