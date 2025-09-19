@@ -1,18 +1,42 @@
 export function initFiltering(elements) {
 	const updateIndexes = (elements, indexes) => {
 		Object.keys(indexes).forEach((elementName) => {
-			elements[elementName].append(...Object.values(indexes[elementName]).map(name => {
-				const el = document.createElement('option');
-				el.textContent = name;
-				el.value = name;
-				return el;
-			}))
-		})
-	}
+			if (elements[elementName]) {
+				// Добавляем пустую опцию "Все"
+				const emptyOption = document.createElement('option');
+				emptyOption.value = '';
+				emptyOption.textContent = 'Все';
+				elements[elementName].appendChild(emptyOption);
+				
+				// Добавляем остальные опции
+				Object.values(indexes[elementName]).forEach(name => {
+						const el = document.createElement('option');
+						el.textContent = name;
+						el.value = name;
+						elements[elementName].appendChild(el);
+				});
+			}
+		});
+	};
 
 	const applyFiltering = (query, state, action) => {
 		// код с обработкой очистки поля
-
+		if (action && action.name === 'clear') {
+			const fieldName = action.dataset.field;
+			
+			// Находим элемент по имени поля
+			Object.keys(elements).forEach(key => {
+					const element = elements[key];
+					if (element && element.name === fieldName) {
+							element.value = ''; // Очищаем значение
+							
+							// Также очищаем соответствующее поле в state
+							if (state[fieldName]) {
+									state[fieldName] = '';
+							}
+					}
+			});
+	}
 
 		// @todo: — отфильтровать данные
 		const filter = {};
