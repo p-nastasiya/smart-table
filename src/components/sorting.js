@@ -1,15 +1,17 @@
-import { sortCollection, sortMap } from "../lib/sort.js";
-
 export function initSorting(columns) {
-	return (data, state, action) => {
+	return (query, state, action) => {
 		let field = null;
 		let order = 'none';
 
 		if (action && action.name === 'sort') {
 			// @todo: #3.1 — запомнить выбранный режим сортировки
-			field = action.dataset.field;  // Используем data-field атрибут
-			const currentOrder = state.sortOrder === field ? state.sortDirection : 'none';
-			order = sortMap[currentOrder] || 'up'; // Используем карту переключения
+			field = action.dataset.field;  // Обработка действия сортировки
+
+			if (state.sortField === field) {
+				order = state.sortOrder === 'up' ? 'down' : 'up';
+			} else {
+				order = 'up';
+			} // Используем карту переключения
 
 			// Сохраняем в state для запоминания
 			state.sortField = field;
@@ -28,9 +30,9 @@ export function initSorting(columns) {
 			// Визуально выделяем текущую колонку
 			action.dataset.value = order;
 			action.classList.remove('sorted-asc', 'sorted-desc');
-			if (order === 'up') {
+			if (order === 'asc') {
 				action.classList.add('sorted-asc');
-			} else if (order === 'down') {
+			} else if (order === 'desc') {
 				action.classList.add('sorted-desc');
 			}
 
@@ -40,8 +42,11 @@ export function initSorting(columns) {
 			order = state.sortOrder;
 		}
 
-		return sortCollection(data, field, order);
-	}
+		// return sortCollection(data, field, order);
+		const sort = (field && order !== 'none') ? `${field}:${order}` : null;
+
+		return sort ? Object.assign({}, query, { sort }) : query;
+	};
 }
 
 
